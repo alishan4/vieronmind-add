@@ -1,6 +1,44 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --color-vieromind-background: #F5F7FA;
+  --color-vieromind-surface: #EAF4F4;
+  --color-vieromind-mint: #A8E6CF;
+  --color-vieromind-teal: #6FB1A0;
+  --color-vieromind-lavender: #C8B6E2;
+  --color-vieromind-text: #374151;
+  --color-vieromind-textLight: #6B7280;
+
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+html,
+body {
+  background-color: var(--color-vieromind-background);
+  color: var(--color-vieromind-text);
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+}
+
+body {
+  background: linear-gradient(
+    180deg,
+    var(--color-vieromind-background) 0%,
+    var(--color-vieromind-surface) 50%,
+    var(--color-vieromind-background) 100%
+  );
+}
+
+button {
+  background-color: var(--color-vieromind-teal);
+  color: white;
+  border-radius: 1rem;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+button:hover {
+  background-color: var(--color-vieromind-mint);
 }

@@ -1,3 +1,7 @@
+// -------------------------
+// Vieromind AI Therapy DB
+// -------------------------
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,28 +11,118 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// -------------------------
+// ENUMS
+// -------------------------
+
 enum Role {
   CLIENT
   THERAPIST
 }
 
+enum Condition {
+  CALM
+  STRESS
+  ANXIETY
+  BURNOUT
+  DEPRESSION
+  LOW_MOOD
+}
+
+enum Severity {
+  LOW
+  MODERATE
+  HIGH
+}
+
+// -------------------------
+// MAIN MODELS
+// -------------------------
+
 model User {
-  id        String    @id @default(cuid())
+  id        String      @id @default(cuid())
   name      String?
-  email     String?   @unique
-  role      Role      @default(CLIENT)
-  condition String?
-  severity  String?
-  createdAt DateTime  @default(now())
-  sessions  Session[]
+  email     String?     @unique
+  role      Role        @default(CLIENT)
+  condition Condition?
+  severity  Severity?
+  createdAt DateTime    @default(now())
+
+  // Relations
+  therapySessions TherapySession[]
+  checkins        CheckIn[]
+  accounts        Account[]
+  sessions        Session[]
+}
+
+// -------------------------
+// 🧠 Therapy Session Records
+// -------------------------
+
+model TherapySession {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  condition Condition?
+  summary   String?
+  notes     String[]
+  createdAt DateTime   @default(now())
+}
+
+// -------------------------
+// 💚 Emotion Check-In Tracker
+// -------------------------
+
+model CheckIn {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+
+  answers   Json
+  score     Int
+  condition Condition
+  severity  Severity
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+// -------------------------
+// 🔐 NextAuth Required Models
+// -------------------------
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  condition String?
-  summary   String?
-  notes     String[]
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
